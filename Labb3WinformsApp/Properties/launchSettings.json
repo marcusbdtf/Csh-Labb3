@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "Labb3WinformsApp": {
+      "commandName": "Project",
+      "commandLineArgs": "-lists"
+    },
+    "Profile 1": {
+      "commandName": "Executable"
+    },
+    "Profile 2": {
+      "commandName": "Project",
+      "commandLineArgs": "-lab"
+    }
+  }
+}

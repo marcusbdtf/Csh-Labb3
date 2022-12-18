@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Labb3ConsoleApp": {
+      "commandName": "Project",
+      "commandLineArgs": "-practice lang3\r\n",
+      "remoteDebugEnabled": false
+    }
+  }
+}
