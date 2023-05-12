@@ -1,342 +1,241 @@
 ﻿using ClassLibraryL3;
+using System;
+using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 
-internal class Program
+namespace Labb3ConsoleApp
 {
-    private static void Main(string[] inputlist)
+    class Program
     {
-        List<object> userInput = FetchInput(inputlist);
-        var inputOption = (userInputOption)userInput[0];
-
-
-        switch (inputOption)
+        static void Main(string[] args)
         {
-            case userInputOption.Null:
-                PrintControls();
-                break;
-            case userInputOption.Lists:
-                OptionLists();
-                break;
-            case userInputOption.New:
-
-            case userInputOption.Add:
-                if (userInput[1].ToString() == "-new")
-                    if (!OptionNew(userInput))
-                        return;
-                OptionAdd(userInput);
-                break;
-            case userInputOption.Remove:
-                OptionRemove(userInput);
-                break;
-            case userInputOption.Words:
-                OptionWords(userInput);
-                break;
-            case userInputOption.Count:
-                OptionCount(userInput);
-                break;
-            case userInputOption.Practice:
-                OptionPractice(userInput);
-                break;
-        }
-        Console.WriteLine();
-    }
-    private static void OptionLists()
-    {
-        string[] array = Wordlist.GetLists();
-        foreach (string el in array)
-        {
-            Console.WriteLine(el);
-        }
-        Console.WriteLine();
-    }
-    private static bool OptionNew(List<object> userInput)
-    {
-        Wordlist wordlist = Wordlist.LoadList(userInput[1].ToString());
-
-        if (wordlist != null)
-        {
-            Console.WriteLine("\n List with name already exists.\n");
-            return false;
-        }
-
-        string[] language = new string[userInput.Count() - 3];
-
-        for (int i = 0; i < language.Length; i++)
-        {
-            language[i] = userInput[2 + i].ToString();
-        }
-        wordlist = new Wordlist(userInput[2].ToString(), language);
-        wordlist.Save();
-        return true;
-    }
-    private static void OptionAdd(List<object> userInput)
-    {
-        Wordlist wordList = Wordlist.LoadList(userInput[1].ToString());
-        if (wordList == null)
-        {
-            var lang = new string[userInput.Count() - 2];
-
-            for (int j = 2; j < userInput.Count(); j++)
+            if (args.Length == 0 || args.Contains("-help") || args.Contains("/?"))
             {
-                lang[j - 2] = userInput[j].ToString();
+                PrintUsage();
+                return;
             }
 
-            wordList = new Wordlist(userInput[1].ToString(), lang);
-            wordList.Save();
-            Console.WriteLine($"\nA new list named '{wordList.Name}' was created\n");
-        }
+            string command = args[0].ToLower();
 
-        var userStrings = new List<string>();
-        
-        // Read user input until a blank line is entered
-        while (true)
-        {
-            // Read the first word
-            Console.WriteLine($"\nEnter word for language {wordList.Languages[0]}: ");
-            string input = Console.ReadLine();
-
-            // If the line is blank, break the loop
-            if (string.IsNullOrEmpty(input))
+            try
             {
-                break;
-            }
-
-            // If there are only two languages in the list, read the second word
-            if (wordList.Languages.Length == 2)
-            {
-                Console.WriteLine($"\nEnter word for language {wordList.Languages[1]}: ");
-                string input2 = Console.ReadLine();
-
-            if (string.IsNullOrEmpty(input2))
-                    {
-                        break;
-                    }
-                userStrings.Add(input);
-                userStrings.Add(input2 + ";");
-                for (int i = 2; i < wordList.Languages.Length; i++)
+                switch (command)
                 {
-                    Console.WriteLine($"\nEnter word for language {wordList.Languages[i]}: ");
-                    string inputN = Console.ReadLine();
-                    if (string.IsNullOrEmpty(inputN))
-                    {
+                    case "-lists":
+                        ListGlossaries();
                         break;
-                    }
-                    userStrings.Add(inputN + ";");
+                    case "-new":
+                        if (args.Length < 4)
+                        {
+                            Console.WriteLine("Error: At least one list name and two languages must be provided.");
+                            return;
+                        }
+
+                        CreateNewGlossary(args[1], args.Skip(2).ToArray());
+                        break;
+                    case "-add":
+                        if (args.Length != 2)
+                        {
+                            Console.WriteLine("Error: Exactly one list name must be provided.");
+                            return;
+                        }
+
+                        AddWords(args[1]);
+                        break;
+                    case "-remove":
+                        if (args.Length < 4)
+                        {
+                            Console.WriteLine(
+                                "Error: At least one list name, one language, and one word must be provided.");
+                            return;
+                        }
+
+                        RemoveWords(args[1], int.Parse(args[2]), args.Skip(3).ToArray());
+                        break;
+                    case "-words":
+                        if (args.Length < 2 || args.Length > 3)
+                        {
+                            Console.WriteLine(
+                                "Error: Exactly one list name and optionally one sort by language must be provided.");
+                            return;
+                        }
+
+                        ListWords(args[1], args.Length == 3 ? int.Parse(args[2]) : 0);
+                        break;
+                    case "-count":
+                        if (args.Length != 2)
+                        {
+                            Console.WriteLine("Error: Exactly one list name must be provided.");
+                            return;
+                        }
+
+                        CountWords(args[1]);
+                        break;
+                    case "-practice":
+                        if (args.Length != 2)
+                        {
+                            Console.WriteLine("Error: Exactly one list name must be provided.");
+                            return;
+                        }
+
+                        Practice(args[1]);
+                        break;
+                    default:
+                        Console.WriteLine("Unknown command. Use '-help' for more information.");
+                        break;
                 }
             }
-
-            if (userStrings.Count == wordList.Languages.Length)
+            catch (Exception ex)
             {
-                wordList.Add(userStrings.ToArray());
-                wordList.Save();
-                userStrings.Clear();
+                Console.WriteLine($"Error: {ex.Message}");
             }
         }
-        if (userStrings.Count > 0)
-        {
-            wordList.Add(userStrings.ToArray());
-            wordList.Save();
-        }
-    }
-    public static bool OptionRemove(List<object> userInput)
-    {
-        Wordlist wordList = Wordlist.LoadList(userInput[1].ToString());
-        if (wordList != null)
-        {
-            int languageIndex = Array.IndexOf(wordList.Languages, userInput[2].ToString());
 
-            if (languageIndex == -1)
+        static void PrintUsage()
+        {
+            Console.WriteLine("Use any of the following parameters:");
+            Console.WriteLine("-lists");
+            Console.WriteLine("-new <list name> <language 1> <language 2> .. <langauge n>");
+            Console.WriteLine("-add <list name>");
+            Console.WriteLine("-remove <list name> <language> <word 1> <word 2> .. <word n>");
+            Console.WriteLine("-words <listname> <sortByLanguage>");
+            Console.WriteLine("-count <listname>");
+            Console.WriteLine("-practice <listname>");
+        }
+
+        static void ListGlossaries()
+        {
+            var glossaries = WordList.GetLists();
+
+            if (glossaries.Length == 0)
             {
-                Console.WriteLine($"\nThe language '{userInput[2]}' could not be found in the list '{wordList.Name}'.\n");
-                return false;
+                Console.WriteLine("No lists found, create a new one!");
             }
             else
             {
-                bool removedAny = false;
-                for (int j = 3; j < userInput.Count(); j++)
+                foreach (var glossary in glossaries)
                 {
-                    // Try to remove the word from the list
-                    bool removed = wordList.Remove(languageIndex, userInput[j].ToString());
-                    if (removed)
-                    {
-                        Console.WriteLine($"\nThe word '{userInput[j]}' was removed from the language '{userInput[2]}' in the list '{wordList.Name}'.\n");
-                        removedAny = true;
-                    }
+                    Console.WriteLine(glossary);
                 }
-                if (!removedAny)
-                {
-                    Console.WriteLine($"\nNone of the specified words were found in the language '{userInput[2]}' in the list '{wordList.Name}'.\n");
-                }
-                wordList.Save();
             }
         }
-        else
+
+        static void CreateNewGlossary(string name, string[] languages)
         {
-            Console.WriteLine("\nError: File not found.\n");
-            return false;
+            var newGlossary = new WordList(name, languages);
+            newGlossary.Save();
         }
 
-        return true;
-    }
-    private static void OptionWords(List<object> userInput)
-    {
-        Wordlist wordList = Wordlist.LoadList(userInput[1].ToString());
-        if (wordList == null)
+        static void AddWords(string listName)
         {
-            Console.WriteLine($"\nThere is no list with name: '{userInput[1]}'.\n");
-            return;
-        }
-
-        // Get the index of the language to sort by
-        if (userInput.Count > 2)
-        {
-            int sortByLanguageIndex;
-            for (int i = 0; i < wordList.Languages.Length; i++)
+            var glossary = WordList.LoadList(listName);
+            Console.WriteLine("Enter words to add. Press enter without input to stop.");
+            while (true)
             {
-                // Check if the language matches the one specified in the userInput list
-                if (wordList.Languages[i] != userInput[2].ToString()) continue;
+                var translations = new List<string>();
+                for (int i = 0; i < glossary.Languages.Length; i++)
                 {
-                    sortByLanguageIndex = i;
-                    wordList.List(sortByLanguageIndex, WordPrinter);
-                    wordList.Save();
+                    Console.WriteLine($"Enter a word in {glossary.Languages[i]}:");
+                    var word = Console.ReadLine();
+                    if (string.IsNullOrWhiteSpace(word))
+                    {
+                        glossary.Save();
+                        return;
+
+                    }
+                    translations.Add(word);
+                }
+                glossary.Add(translations.ToArray());
+                glossary.Save();
+            }
+        }
+
+        static void RemoveWords(string listName, int languageIndex, string[] words)
+        {
+            var glossary = WordList.LoadList(listName);
+            if (glossary == null)
+            {
+                Console.WriteLine("Failed to load the glossary.");
+                return;
+            }
+
+            foreach (var word in words)
+            {
+                bool removed = glossary.Remove(languageIndex, word);
+                if (removed)
+                {
+                    Console.WriteLine($"Successfully removed {word} from the glossary.");
+                }
+                else
+                {
+                    Console.WriteLine($"Failed to remove {word}. The word does not exist in the selected language.");
+                }
+            }
+            glossary.Save();
+        }
+
+        static void ListWords(string listName, int sortByLanguage)
+        {
+            var glossary = WordList.LoadList(listName);
+            glossary.List(sortByLanguage, translations =>
+            {
+                //list translations paired with respective lang
+                var translationsWithLanguages = new List<(string Language, string Translation)>();
+                for (int i = 0; i < glossary.Languages.Length; i++)
+                {
+                    translationsWithLanguages.Add((glossary.Languages[i], translations[i]));
+                }
+
+                //sort list by lang
+                var sortedTranslations = translationsWithLanguages.OrderBy(t => t.Language == glossary.Languages[sortByLanguage]).ToList();
+                foreach (var (language, translation) in sortedTranslations)
+                {
+                    Console.WriteLine($"{language}: {translation}");
+                }
+
+                Console.WriteLine();
+            });
+        }
+
+        static void CountWords(string listName)
+        {
+            var glossary = WordList.LoadList(listName);
+            Console.WriteLine($"Total words in {listName}: {glossary.Count()}");
+        }
+
+        static void Practice(string listName)
+        {
+            var glossary = WordList.LoadList(listName);
+            int correctCount = 0;
+            int totalCount = 0;
+
+            while (true)
+            {
+                var word = glossary.GetWordToPractice();
+
+                Console.WriteLine($"Translate the {glossary.Languages[word.FromLanguage]} word '{word.Translations[word.FromLanguage]}' to {glossary.Languages[word.ToLanguage]}:");
+                var translation = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(translation))
+                {
                     break;
                 }
-        }
-            
-        }
-        else
-        {
-            wordList.List(0, WordPrinter);
-        }
-    }
-    private static void WordPrinter(string[] array)
-    {
-        string str = "";
-        foreach (string s in array)
-        {
-            str += $"{s}\t";
-        }
-        Console.WriteLine(str);
-    }
-    private static void OptionCount(List<object> userInput)
-    {
-        Wordlist wordList = Wordlist.LoadList(userInput[1].ToString());
-        if (wordList == null)
-        {
-            Console.WriteLine("\nThe list don't exist.\n");
-            return;
-        }
-        Console.WriteLine(
-            $"\nThere are {wordList.Count()*wordList.Languages.Length} words in list '{wordList.Name}'\n");
-    }
-    public static void OptionPractice(List<object> userInput)
-    {
-        // Get the listname from the user input
-        string listname = userInput[1].ToString();
 
-        Wordlist wordList = Wordlist.LoadList(listname);
+                if (translation.ToLower() == word.Translations[word.ToLanguage].ToLower())
+                {
+                    Console.WriteLine("Correct!");
+                    correctCount++;
+                }
+                else
+                {
+                    Console.WriteLine($"Incorrect. The correct translation is '{word.Translations[word.ToLanguage]}'");
+                }
 
-        if (wordList == null)
-        {
-            Console.WriteLine($"\nThe list named '{listname}' doesn't exist.\n");
-            return;
-        }
-
-        int practicedWords = 0;
-        int correctAnswers = 0; 
-
-        while (true)
-        {
-            Word wordToPractice = wordList.GetWordToPractice();
-
-            if (wordToPractice == null)
-            {
-                break;
+                totalCount++;
             }
 
-            // Get the translation of the word in the "from" language
-            string fromTranslation = wordToPractice.Translations[wordToPractice.FromLanguage];
-
-            Console.WriteLine($"Translate '{fromTranslation}' to {wordList.Languages[wordToPractice.ToLanguage]}");
-
-            string answer = Console.ReadLine();
-
-            if (string.IsNullOrEmpty(answer))
-            {
-                break;
-            }
-
-            practicedWords++;
-
-            if (answer == wordToPractice.Translations[wordToPractice.ToLanguage])
-            {
-                correctAnswers++;
-                Console.WriteLine("Correct!");
-            }
-            else
-            {
-                Console.WriteLine("Incorrect.");
-            }
+            Console.WriteLine($"You practiced {totalCount} words, and got {correctCount} correct.");
         }
 
-        // Calculate the percentage
-
-        Console.WriteLine($"\nYou scored {correctAnswers} correct. Words practiced {practicedWords}. Percentage {((float)correctAnswers) /practicedWords*100:0.0}%.\n");
-    }
-    private enum userInputOption
-    {
-        Null = 0, Lists = 1, New = 2, Add = 3, Remove = 4, Words = 5, Count = 6, Practice = 7
-    }
-    private static void PrintControls()
-    {
-        Console.WriteLine("-lists");
-        Console.WriteLine("-new <list name> <language 1> <language 2> .. <language n>");
-        Console.WriteLine("-add <list name>");
-        Console.WriteLine("-remove <list name> <language> <word 1> <word 2> .. <word n>");
-        Console.WriteLine("-words <list name> <sortByLanguage>");
-        Console.WriteLine("-count <list name>");
-        Console.WriteLine("-practice <list name>\n");
-    }
-    private static List<object> FetchInput(string[] inputlist)
-    {
-        if (inputlist.Length == 0 || string.Join("", inputlist).Count(c => c == '-') == 0)
-        {
-            return new List<object>() { userInputOption.Null };
-        }
-        var regexDict = new Dictionary<userInputOption, string>
-        {
-            {userInputOption.Lists, @"-lists"},
-            {userInputOption.New, @"(?<=-new\s+)\b[a-öA-Ö0-9]+\s+(?:[a-öA-Ö0-9]+\s*)+"},
-            {userInputOption.Add, @"(?<=-add\s+)\b[a-öA-Ö0-9]+\s+[\S]+\b"},
-            {userInputOption.Remove, @"(?<=-remove\s+)\b[a-öA-Ö0-9]+\s+\b[a-öA-Ö0-9]+\s+[\S]+(\s+[\S]+)*\b"},
-            {userInputOption.Words, @"(?<=-words\s+)\b[a-öA-Ö0-9]+(\s+[\S]*)?\b"},
-            {userInputOption.Count, @"(?<=-count\s+)\b[a-öA-Ö0-9]+\b"},
-            {userInputOption.Practice, @"(?<=-practice\s+)(\b[a-öA-Ö0-9]+\b)"},
-        };
-
-        string joinedArgs = string.Join(" ", inputlist);
-    
-        var output = new List<object>();
-
-        // Loop through regex in the dict
-        foreach (KeyValuePair<userInputOption, string> keyValuePair in regexDict)
-        {
-            var rgx = new Regex(keyValuePair.Value, RegexOptions.IgnoreCase);
-            
-            if (!rgx.IsMatch(joinedArgs)) continue;
-
-            // get matches from the input string
-            List<string> matches =
-                rgx.Matches(joinedArgs).Cast<Match>().Select(m => m.Value.ToLower().Trim()).ToList();
-
-            output.Add(keyValuePair.Key);
-            foreach (string match in matches)
-            {
-                output.AddRange(match.Split(' '));
-            }
-            return output; // 
-        }
-        return output;
     }
 }

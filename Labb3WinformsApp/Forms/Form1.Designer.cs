@@ -42,6 +42,7 @@
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.buttonStartTraining = new System.Windows.Forms.Button();
+            this.buttonRefresh = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -120,7 +121,7 @@
             // 
             this.selectWordsListToolStripMenuItem.Name = "selectWordsListToolStripMenuItem";
             this.selectWordsListToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.W)));
-            this.selectWordsListToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.selectWordsListToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
             this.selectWordsListToolStripMenuItem.Text = "Lists";
             this.selectWordsListToolStripMenuItem.ToolTipText = "Lists";
             this.selectWordsListToolStripMenuItem.Click += new System.EventHandler(this.selectWordsListToolStripMenuItem_Click);
@@ -129,7 +130,7 @@
             // 
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
             this.editToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E)));
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
             this.editToolStripMenuItem.Text = "Edit";
             this.editToolStripMenuItem.Click += new System.EventHandler(this.editToolStripMenuItem_Click);
             // 
@@ -137,7 +138,7 @@
             // 
             this.newWordsListToolStripMenuItemNewWord.Name = "newWordsListToolStripMenuItemNewWord";
             this.newWordsListToolStripMenuItemNewWord.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.newWordsListToolStripMenuItemNewWord.Size = new System.Drawing.Size(180, 22);
+            this.newWordsListToolStripMenuItemNewWord.Size = new System.Drawing.Size(142, 22);
             this.newWordsListToolStripMenuItemNewWord.Text = "New";
             this.newWordsListToolStripMenuItemNewWord.Click += new System.EventHandler(this.newWordsListToolStripMenuItemNewWord_Click);
             // 
@@ -145,7 +146,7 @@
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
             this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
             this.saveToolStripMenuItem.Text = "Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
@@ -153,7 +154,7 @@
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Q)));
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -168,12 +169,23 @@
             this.buttonStartTraining.UseVisualStyleBackColor = true;
             this.buttonStartTraining.Click += new System.EventHandler(this.buttonStartTraining_Click);
             // 
+            // buttonRefresh
+            // 
+            this.buttonRefresh.Location = new System.Drawing.Point(12, 382);
+            this.buttonRefresh.Name = "buttonRefresh";
+            this.buttonRefresh.Size = new System.Drawing.Size(135, 23);
+            this.buttonRefresh.TabIndex = 3;
+            this.buttonRefresh.Text = "Refresh List";
+            this.buttonRefresh.UseVisualStyleBackColor = true;
+            this.buttonRefresh.Click += new System.EventHandler(this.buttonRefresh_Click);
+            // 
             // Form1
             // 
             this.AcceptButton = this.buttonStartTraining;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(523, 429);
+            this.Controls.Add(this.buttonRefresh);
             this.Controls.Add(this.buttonStartTraining);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuStrip1);
@@ -207,5 +219,6 @@
         private ToolStripMenuItem saveToolStripMenuItem;
         private ToolStripMenuItem exitToolStripMenuItem;
         private ToolStripMenuItem editToolStripMenuItem;
+        private Button buttonRefresh;
     }
 }

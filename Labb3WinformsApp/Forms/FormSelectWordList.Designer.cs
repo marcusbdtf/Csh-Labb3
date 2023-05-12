@@ -143,6 +143,7 @@
             this.Name = "FormSelectWordList";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "FormSelectWordList";
+            this.Load += new System.EventHandler(this.FormSelectWordList_Load_1);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);

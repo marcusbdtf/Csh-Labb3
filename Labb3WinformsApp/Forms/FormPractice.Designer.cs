@@ -110,6 +110,7 @@
             this.Name = "FormPractice";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "FormPractice";
+            this.Load += new System.EventHandler(this.FormPractice_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

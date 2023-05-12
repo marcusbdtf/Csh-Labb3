@@ -13,12 +13,12 @@ namespace Labb3WinformsApp.Forms
 {
     public partial class FormPractice : Form
     {
-        private Wordlist _wordlist;
+        private WordList _wordlist;
         private int _totalWords;
         private int _correctWords;
         Word word { get; set; }
 
-        public FormPractice(Wordlist wordlist)
+        public FormPractice(WordList wordlist)
         {
             InitializeComponent();
             _wordlist = wordlist;
@@ -32,13 +32,12 @@ namespace Labb3WinformsApp.Forms
         {
             labelQ.Text = $"Translate '{word.Translations[word.FromLanguage]}' to {_wordlist.Languages[word.ToLanguage]}";
         }
-
         private void buttonEnter_Click(object sender, EventArgs e)
         {
             _totalWords++;
 
             string userAnswer = textBoxAns.Text?.ToLower();
-            if (word.Translations[word.ToLanguage] == userAnswer)
+            if (word != null && word.Translations[word.ToLanguage] == userAnswer)
             {
                 _correctWords++;
                 labelResult.Text = "Correct!";
@@ -50,18 +49,25 @@ namespace Labb3WinformsApp.Forms
             textBoxAns.Clear();
 
             word = _wordlist.GetWordToPractice();
-            labelQ.Text = $"Translate '{word.Translations[word.FromLanguage]}' to {_wordlist.Languages[word.ToLanguage]}";
+            if (word != null)
+            {
+                labelQ.Text = $"Translate '{word.Translations[word.FromLanguage]}' to {_wordlist.Languages[word.ToLanguage]}";
+            }
+            else
+            {
+                labelQ.Text = "No word to practice";
+            }
         }
-
         private void buttonExit_Click(object sender, EventArgs e)
         {
             string message = $"Amount of correct words: {_correctWords}/{_totalWords}\nPercentage: {((float)_correctWords / _totalWords) * 100:0.0}%";
             MessageBox.Show(message, "Practice Results");
             Close();
         }
-
-
-
         private void textBoxAns_TextChanged(object sender, EventArgs e){ }
+        private void FormPractice_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

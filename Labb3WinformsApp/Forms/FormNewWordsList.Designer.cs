@@ -107,6 +107,7 @@
             this.Name = "FormNewWordsList";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "FormNewWordsList";
+            this.Load += new System.EventHandler(this.FormNewWordsList_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

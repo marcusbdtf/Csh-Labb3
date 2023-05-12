@@ -8,195 +8,140 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace ClassLibraryL3
 {
-    public class Wordlist
+    public class WordList
     {
-        private static List<Word> Words { get; set; } = new List<Word>();
-        public string Name { get; } // name of language list
-
+        private List<Word> _words;
+        public string Name { get; }
         public string[] Languages { get; }
-        public Wordlist(string name, params string[] languages)//takes in the name of the wordlist, languages
+
+        private static readonly string _dataPath =
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GlossaryApp");
+
+        public WordList(string name, params string[] languages)
         {
-            Name = name;
-            Languages = languages;
+            Name = name.ToLower();
+            Languages = languages.Select(l => l.ToLower()).ToArray();
+            _words = new List<Word>();
         }
-        public static string[] GetLists()//gets all the wordlists in the wordlists folder
+
+        public static string[] GetLists()
         {
-
-            string dataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-
-            string namePath = $"\\{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}";
-
-            string fullPath = dataPath + namePath;
-            // gets the path to the wordlists folder
-
-
-            string[] listNamesWithoutExtension = Directory.GetFiles(fullPath).Select(n => Path.GetFileNameWithoutExtension(n)).ToArray();
-            // gets all files in the path and removes the extension
-            return listNamesWithoutExtension;
-            // returns lists from local app folder and removes extension
+            Directory.CreateDirectory(_dataPath); 
+            return Directory.GetFiles(_dataPath, "*.dat").Select(Path.GetFileNameWithoutExtension).ToArray();
         }
-        public static Wordlist LoadList(string name)
+
+        public static WordList LoadList(string name)
         {
-            // Get the path to the wordlists folder
-            string dataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string namePath = $"\\{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}";
-            string fullPath = dataPath + namePath;
-            string fullPathWithExtension = fullPath + "\\" + name + ".dat";
-            if (!File.Exists(fullPathWithExtension))
+            var path = Path.Combine(_dataPath, $"{name.ToLower()}.dat");
+            if (!File.Exists(path))
+                return null;
+
+            try
             {
+                using (var reader = new StreamReader(path))
+                {
+                    var languages = reader.ReadLine().Split(';');
+
+                    languages = languages.Where(language => !string.IsNullOrWhiteSpace(language)).ToArray();
+
+                    var wordList = new WordList(name, languages);
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        var translations = line.Split(';');
+
+                        translations = translations.Where(translation => !string.IsNullOrWhiteSpace(translation)).ToArray();
+
+                        wordList._words.Add(new Word(translations));
+                    }
+
+                    return wordList;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to load list: {ex.Message}");
                 return null;
             }
-
-            List<string> lines = File.ReadAllLines(fullPathWithExtension).ToList();
-            if (lines.Count == 0)
-            {
-                return null;
-            }
-
-            string[] languages = null;
-            if (lines.Count > 1)
-            {
-                languages = lines[0]?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-            }
-
-            Words.Clear();
-            for (int i = 1; i < lines.Count; i++)
-            {
-                Words.Add(new Word(lines[i]?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)));
-            }
-
-            return new Wordlist(name, languages);
         }
 
         public void Save()
         {
-            // Get the path to the wordlists folder
-            string dataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string namePath = $"\\{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}";
-            string fullPath = dataPath + namePath;
-            string fullPathWithExtension = fullPath + "\\" + Name + ".dat";
-
-            // Create the wordlists folder if it doesn't already exist
-            Directory.CreateDirectory(fullPath);
-
-            // streamwriter to write to the file
-            using (var sr = new StreamWriter(fullPathWithExtension, false))
+            Directory.CreateDirectory(_dataPath);
+            var path = Path.Combine(_dataPath, $"{Name}.dat");
+            try
             {
-                // Write langs to the first line of the file
-                sr.WriteLine(string.Join(";", Languages));
-
-                if (Words == null)
+                using (var writer = new StreamWriter(path))
                 {
-                    return;
+                    writer.WriteLine(string.Join(';', Languages) + ';');
+                    foreach (var word in _words)
+                    {
+                        writer.WriteLine(string.Join(';', word.Translations) + ';');
+                    }
                 }
-                if (Words.Count == 0)
-                {
-                    return;
-                }
-
-                foreach (var word in Words)
-                {
-                    sr.WriteLine(string.Join(";", word.Translations));
-                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to save list: {ex.Message}");
             }
         }
 
         public void Add(params string[] translations)
         {
-            // takes only non null vals
-            translations = translations.Where(p => p != null).Select(p => p.ToLower()).ToArray();
-            Words.Add(new Word(translations));
-        }
-        
-        public void Clear()
-        {
-            Words.Clear();
-        }
+            if (translations.Length != Languages.Length)
+                throw new ArgumentException("Incorrect number of translations.");
 
-        public bool Remove(int languageIndex, string word)
+            translations = translations.Select(t => t.ToLower()).ToArray();
+            if (_words.Any(w => w.Translations.SequenceEqual(translations)))
+                throw new ArgumentException("Word already exists in the list.");
+
+            _words.Add(new Word(translations));
+        }
+        public bool WordExists(string word, int languageIndex)
         {
-            if (languageIndex < 0 || languageIndex >= Languages.Length)
+            return _words.Exists(w => w.Translations[languageIndex].Equals(word, StringComparison.InvariantCultureIgnoreCase));
+        }
+        public bool Remove(int translation, string word)
+        {
+            var wordToRemove = _words.FirstOrDefault(w =>
+                w != null && w.Translations[translation].Equals(word.ToLower(), StringComparison.OrdinalIgnoreCase));
+            if (wordToRemove != null)
             {
-                return false;
+                _words.Remove(wordToRemove);
+                return true;
             }
 
-            for (int i = 0; i < Words.Count; i++)
-            {
-                if (Words[i].Translations[languageIndex] == word)
-                {
-                    Words.RemoveAt(i);
-                    Save();
-                    return true;
-                }
-            }
             return false;
         }
-        public int Count()
-        {
-            return Words.Count();
-        }
+
+        public int Count() => _words.Count;
+
         public void List(int sortByTranslation, Action<string[]> showTranslations)
         {
-            // iterate through the sorted list and invoke the showTranslations callback for each word
-            Words = IndexSwap(sortByTranslation);
-
-            foreach (Word w in Words)
+            foreach (var word in _words.OrderBy(w => w.Translations[sortByTranslation]))
             {
-                showTranslations(w.Translations);
+                showTranslations(word.Translations);
             }
         }
-        public List<Word> IndexSwap(int i)
+        public void Clear()
         {
-            List<Word> sortedWords = new List<Word> { };
-            foreach (var word in Words)
-            {
-                if (word != null && word.Translations.Length > i)
-                {
-                    // Create a new string array to store the swapped translations
-                    string[] tempArray = new string[word.Translations.Length];
-
-                    // Swap the values of the translations
-                    for (int j = 0; j < word.Translations.Length; j++)
-                    {
-                        if (j == i)
-                        {
-                            tempArray[j] = word.Translations[0];
-                        }
-                        else if (j == 0)
-                        {
-                            tempArray[j] = word.Translations[i];
-                        }
-                        else
-                        {
-                            tempArray[j] = word.Translations[j];
-                        }
-                    }
-
-                    // Add the swapped translations to the sortedWords list
-                    sortedWords.Add(new Word(tempArray));
-                }
-            }
-            return sortedWords;
+            _words.Clear();
         }
 
         public Word GetWordToPractice()
         {
-            var rand = new Random();
-            int randWord = rand.Next(0, Words.Count());
-            int randFromLang = rand.Next(Languages.Length);
-            int randToLang = rand.Next(Languages.Length);
+            var random = new Random();
+            var wordToPractice = _words[random.Next(_words.Count)];
 
-            while (randFromLang == randToLang)
+            int fromLanguageIndex;
+            int toLanguageIndex;
+            do
             {
-                randToLang = rand.Next(Languages.Length);
-            }
+                fromLanguageIndex = random.Next(Languages.Length);
+                toLanguageIndex = random.Next(Languages.Length);
+            } while (fromLanguageIndex == toLanguageIndex);
 
-            if (Words.Count == 0) return null;
-
-            var word = new Word(randFromLang, randToLang, Words[randWord].Translations);
-
-            return word;
+            return new Word(fromLanguageIndex, toLanguageIndex, wordToPractice.Translations);
         }
     }
 }
-        
