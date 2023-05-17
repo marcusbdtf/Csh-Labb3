@@ -236,6 +236,5 @@ namespace Labb3ConsoleApp
 
             Console.WriteLine($"You practiced {totalCount} words, and got {correctCount} correct.");
         }
-
     }
 }

@@ -39,7 +39,6 @@
             this.selectWordsListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newWordsListToolStripMenuItemNewWord = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.buttonStartTraining = new System.Windows.Forms.Button();
             this.buttonRefresh = new System.Windows.Forms.Button();
@@ -111,7 +110,6 @@
             this.selectWordsListToolStripMenuItem,
             this.editToolStripMenuItem,
             this.newWordsListToolStripMenuItemNewWord,
-            this.saveToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
@@ -121,7 +119,7 @@
             // 
             this.selectWordsListToolStripMenuItem.Name = "selectWordsListToolStripMenuItem";
             this.selectWordsListToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.W)));
-            this.selectWordsListToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+            this.selectWordsListToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.selectWordsListToolStripMenuItem.Text = "Lists";
             this.selectWordsListToolStripMenuItem.ToolTipText = "Lists";
             this.selectWordsListToolStripMenuItem.Click += new System.EventHandler(this.selectWordsListToolStripMenuItem_Click);
@@ -130,7 +128,7 @@
             // 
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
             this.editToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E)));
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.editToolStripMenuItem.Text = "Edit";
             this.editToolStripMenuItem.Click += new System.EventHandler(this.editToolStripMenuItem_Click);
             // 
@@ -138,23 +136,15 @@
             // 
             this.newWordsListToolStripMenuItemNewWord.Name = "newWordsListToolStripMenuItemNewWord";
             this.newWordsListToolStripMenuItemNewWord.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.newWordsListToolStripMenuItemNewWord.Size = new System.Drawing.Size(142, 22);
+            this.newWordsListToolStripMenuItemNewWord.Size = new System.Drawing.Size(180, 22);
             this.newWordsListToolStripMenuItemNewWord.Text = "New";
             this.newWordsListToolStripMenuItemNewWord.Click += new System.EventHandler(this.newWordsListToolStripMenuItemNewWord_Click);
-            // 
-            // saveToolStripMenuItem
-            // 
-            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
-            this.saveToolStripMenuItem.Text = "Save";
-            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Q)));
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -216,7 +206,6 @@
         private DataGridViewTextBoxColumn Column3;
         private DataGridViewTextBoxColumn Column4;
         private Button buttonStartTraining;
-        private ToolStripMenuItem saveToolStripMenuItem;
         private ToolStripMenuItem exitToolStripMenuItem;
         private ToolStripMenuItem editToolStripMenuItem;
         private Button buttonRefresh;

@@ -55,16 +55,12 @@ namespace Labb3WinformsApp.Forms
 
             wordList.List(languageIndex, translations =>
             {
-                // Create a list to hold the cell values
                 List<string> cellValues = new List<string>();
 
-                // Add each translation to the list
                 for (int i = 0; i < translations.Length; i++)
                 {
                     cellValues.Add(translations[i]);
                 }
-
-                // Add the list as a new row in the DataGridView
                 dataGridViewAdder.Rows.Add(cellValues.ToArray());
             });
         }

@@ -118,7 +118,6 @@ namespace Labb3WinformsApp
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // If wordList is null, do nothing
             if (wordList == null)
             {
                 return;
@@ -145,8 +144,6 @@ namespace Labb3WinformsApp
             }
             wordList.Save();
         }
-
-
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
@@ -158,7 +155,6 @@ namespace Labb3WinformsApp
             {
                 FormAddWords form = new FormAddWords(wordList);
                 form.Show();
-
             }
         }
         private void buttonRefresh_Click(object sender, EventArgs e)
